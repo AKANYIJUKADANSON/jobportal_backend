@@ -45,4 +45,83 @@
                 echo "error while deleting the job";
             }
         }
+
+        /**
+         * --------------------------------------------------------
+         * -------------------- FILES -----------------------------
+         * --------------------------------------------------------
+        */
+
+        public function uploadFile(){
+
+            // Set the timezone to East African Time
+            date_default_timezone_set('Africa/Nairobi');
+
+            $file_name = date('Ymdhis').'_'.str_replace(" ", "_", $_FILES['file']['name']);
+
+            // set file upload directory
+            $upload_directory = FCPATH. 'uploads/attachments';
+
+            // check if upload directory is created, and if not we create it
+            if (! is_dir($upload_directory)){
+                // make directory
+                mkdir($upload_directory, 0777, true);
+            }
+
+            // get image data into the config array
+            $config = [
+                'upload_path' => $upload_directory,
+                'allowed_types' => 'jpg|png|jpeg',
+                'file_name' => $file_name,
+            ];
+
+
+            // Call the upload library and pass the config array
+            $this->load->library('upload', $config);
+
+            /**
+             * Check if the file is uploaded successfully by checking if there is
+             * any error and redirect to the form with an error message
+             */
+             
+            if ( ! $this->upload->do_upload('file'))
+            {
+                $error_response = [
+                    'status' => "400",
+                    'img' => '',
+                    'message' => "File upload failure"
+                ];
+
+                echo json_encode($error_response);
+            }
+            else{
+                // if the image is stored then add data to the db
+                // get the file name that is used in the $config upload array
+                $uploaded_file_name = $this->upload->data('file_name');
+
+                $file_data = [
+                    'file_name' => $uploaded_file_name,
+                    'description' => $this->input->post('caption'),
+                ];
+
+                if($this->jobs->save_file_data($file_data)){
+                    $success_data = [
+                        'status' => '200',
+                        'message' => "File saved successfully"
+                    ];
+
+                    echo json_encode($success_data);    
+                }else{
+                    $error_data = [
+                        'status' => '400',
+                        'message' => "Error while saving the file"
+                    ];
+
+                    echo json_encode($error_data);  
+                }
+
+
+            }     
+
+        }
     }
