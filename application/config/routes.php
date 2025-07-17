@@ -57,3 +57,6 @@ $route['jobs'] = 'JobsController/index';
 $route['jobs/add-job'] = 'JobsController/addJob';
 $route['jobs/(:any)'] = 'JobsController/singleJob/$1';
 $route['jobs/delete/(:any)'] = 'JobsController/deleteJob/$1';
+
+// File uploading
+$route['files/upload'] = 'JobsController/uploadFile';

@@ -53,4 +53,9 @@ class Jobs_model extends CI_Model {
     }
 
 
+    public function save_file_data($file_data){
+        return $this->db->insert('files', $file_data);
+    }
+
+
 }
